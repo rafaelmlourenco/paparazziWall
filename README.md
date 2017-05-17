@@ -4,7 +4,9 @@ This repository has all the necessary files to randomly trigger 7 flashes and a 
 
 ## Requirements
 + Arduino/Genuino Board
-+ Python
++ Python 3 (https://www.python.org/)
++ PySerial (https://github.com/pyserial/) 
+  + Install command: `pip install pyserial`
 + 8 Opto-couplers
 + 8 Resistors
 
