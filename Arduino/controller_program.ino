@@ -1,5 +1,13 @@
 int CONTROL_BUTTON = 2;
 int STATUS_LED = 3;
+int FLASH_01 = 4;
+int FLASH_02 = 5;
+int FLASH_03 = 6;
+int FLASH_04 = 7;
+int FLASH_05 = 8;
+int FLASH_06 = 9;
+int FLASH_07 = 10;
+int CAMERA_SHUTTER = 11;
 
 int INIT_STATUS = 1;
 int INIT_STATUS_DURATION = 1000;
@@ -8,12 +16,20 @@ int STOP_STATUS_DURATION = 150;
 int ERROR_SERIAL = 2;
 int ERROR_SERIAL_DURATION = 500;
 
+unsigned long FLASHING_DURATION = 10000; 
+
+int switchState = 0;
+bool flashState = true;
+bool lastState = false;
+
+unsigned long startTime = 0;
+unsigned long currentTime = 0;
+
 String START_FLASHING_MSG = "Start Flashing";
 String READY_MSG = "Arduino is ready!";
-int switchState = 0;
-//long randNumber;
+
 String rcvString;
-bool flashState = false;
+
 
 void setup() {
   //Initialize Serial Port (USB)
@@ -21,14 +37,14 @@ void setup() {
 
   // put your setup code here, to run once:
   pinMode(STATUS_LED, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  pinMode(FLASH_01, OUTPUT);
+  pinMode(FLASH_02, OUTPUT);
+  pinMode(FLASH_03, OUTPUT);
+  pinMode(FLASH_04, OUTPUT);
+  pinMode(FLASH_05, OUTPUT);
+  pinMode(FLASH_06, OUTPUT);
+  pinMode(FLASH_07, OUTPUT);
+  pinMode(CAMERA_SHUTTER, OUTPUT);
   
   // Control button (stop button)
   pinMode(CONTROL_BUTTON, INPUT);
@@ -45,10 +61,21 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   switchState = digitalRead(CONTROL_BUTTON);
-
+  
   if (switchState == HIGH) {
     flashState = false;
     blinkStatusLED(STOP_STATUS, STOP_STATUS_DURATION);
+    startTime = 0;
+  }
+
+  if(lastState == false && flashState == true){
+    startTime = millis();
+  }
+
+  currentTime = millis();
+
+  if(currentTime - startTime >= FLASHING_DURATION){
+    flashState = false;
   }
 
   if (Serial.available() > 0) {
@@ -59,21 +86,26 @@ void loop() {
     int randomDuration = random(200, 300);
     flashSingleRandomly(randomDuration);
   }
+
+  lastState = flashState;
 } // go back to the beginning of the loop
 
 void flashSingleRandomly(int duration) {
   int portNumber = random(4, 11);
-  digitalWrite(11, HIGH);
+  digitalWrite(CAMERA_SHUTTER, HIGH);
   digitalWrite(portNumber, HIGH);
+  
   delay(duration);
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(6, LOW);
-  digitalWrite(7, LOW);
-  digitalWrite(8, LOW);
-  digitalWrite(9, LOW);
-  digitalWrite(10, LOW);
-  digitalWrite(11, LOW);
+  
+  digitalWrite(CAMERA_SHUTTER, LOW);
+  digitalWrite(FLASH_01, LOW);
+  digitalWrite(FLASH_02, LOW);
+  digitalWrite(FLASH_03, LOW);
+  digitalWrite(FLASH_04, LOW);
+  digitalWrite(FLASH_05, LOW);
+  digitalWrite(FLASH_06, LOW);
+  digitalWrite(FLASH_07, LOW);
+ 
   delay(duration);
 }
 
@@ -84,7 +116,7 @@ void handleSerialMsg() {
     flashState = true;
   } else {
     flashState = false;
-    blinkStatusLED(ERROR_SERIAL,ERROR_SERIAL_DURATION);
+    blinkStatusLED(ERROR_SERIAL, ERROR_SERIAL_DURATION);
   }
 }
 
@@ -96,4 +128,3 @@ void blinkStatusLED(int number, int duration) {
     delay(100);
   }
 }
-
