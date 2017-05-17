@@ -1,7 +1,7 @@
 import socket
 import serial
 import time
-SERIAL_PORT = 'COM4'
+SERIAL_PORT = 'COM8'
 READY_MSG = 'Arduino is ready!\r\n'
 START_FLASHING_MSG = b'Start Flashing'
 ARDUINO_LABEL = 'Arduino: '
